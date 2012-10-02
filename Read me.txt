@@ -1,3 +1,27 @@
 ==========================================
 Löve2D Prototype
 ==========================================
+
+Overview
+--------
+
+This project is a basic game made in Lua using the Löve2D (https://love2d.org/) game engine.
+
+Setup
+-----
+
+For quick and easy setup on Windows you'll need:
+
+7-zip		www.7-zip.org
+Löve2D(0.8.0)	https://love2d.org/
+
+Once you have both of these programs then go to the Hg repository that you downloaded
+and run the build.bat file to create the love file of the game
+
+Development
+-----------
+
+Code organization - need to break up files into modules
+Collisions
+Animations
+Level management and transition
