@@ -15,18 +15,34 @@ hero.dt = 250
 
 end
 
-
 function draw_character()
    love.graphics.draw(hero.pic, hero.x, hero.y)
+end
 
+function draw_character_position()
+   love.graphics.print(hero.x + Levels.get_map_x_pos(), 40, 40)
+   love.graphics.print(hero.y + Levels.get_map_y_pos(), 40, 55)
 end
+
+function get_character_x_pos()
+	local x = hero.x + Levels.get_map_x_pos()
+	return x
+end
+
+function get_character_y_pos()
+	local y = hero.y + Levels.get_map_y_pos()
+	return y
+end
+
 function love.draw()
-  Levels:draw_map()
+  Levels.draw_map()
   draw_character()
+  draw_character_position()
 end
+
 function love.update( dt )
     -- get input
-    if love.keyboard.isDown( "down" ) then
+    if love.keyboard.isDown( "down" ) and get_character_y_pos() < (Levels.map_h - 1) * 40 then
         --map_offset_y = map_offset_y - move_speed * dt
 		if hero.y < 400 then
 		   hero.y = hero.y + hero.dt * dt
@@ -34,7 +50,7 @@ function love.update( dt )
 		   Levels.map_offset_y = Levels.map_offset_y - hero.dt * dt
 		end
     end
-    if love.keyboard.isDown( "up" ) then
+    if love.keyboard.isDown( "up" ) and get_character_y_pos() > 0 then
         --map_offset_y = map_offset_y + move_speed * dt
 		if hero.y > 150 then
 		   hero.y = hero.y - hero.dt * dt
@@ -42,36 +58,23 @@ function love.update( dt )
 		   Levels.map_offset_y = Levels.map_offset_y + hero.dt * dt
 		end
     end
-    if love.keyboard.isDown( "right" ) then
+    if love.keyboard.isDown( "right" ) and get_character_x_pos() < (Levels.map_w - 1) * 40 then
         --map_offset_x = map_offset_x - move_speed * dt
 		if hero.x < 600 then
 		   hero.x = hero.x + hero.dt * dt
 		else
-	       Levels.map_offset_x = Levels.map_offset_x - hero.dt * dt
+	       Levels.changeOffset("right", dt * hero.dt)
 		end
     end
-    if love.keyboard.isDown( "left" ) then
+    if love.keyboard.isDown( "left" ) and get_character_x_pos() > 0 then
         --map_offset_x = map_offset_x + move_speed * dt
 		if hero.x > 150 then
 		   hero.x = hero.x - hero.dt * dt
 		else
-		   Levels.map_offset_x = Levels.map_offset_x + hero.dt * dt
+		   Levels.changeOffset("left", dt * hero.dt)
 		end
     end
-	if Levels.map_offset_x > -40 and Levels.map_x > 0 then
-	   Levels.map_offset_x = Levels.map_offset_x - 40
-	   Levels.map_x = Levels.map_x - 1
-	elseif Levels.map_offset_x < -80 and Levels.map_x < Levels.map_w - Levels.map_display_w then
-	   Levels.map_offset_x = Levels.map_offset_x + 40
-	   Levels.map_x = Levels.map_x + 1
-	end
-	if Levels.map_offset_y > -40 and Levels.map_y > 0 then
-	   Levels.map_offset_y = Levels.map_offset_y - 40
-	   Levels.map_y = Levels.map_y - 1
-	elseif Levels.map_offset_y < -80 and Levels.map_y < Levels.map_h - Levels.map_display_h then
-	   Levels.map_offset_y = Levels.map_offset_y + 40
-	   Levels.map_y = Levels.map_y + 1
-	end
+	Levels.update()
 	if love.keyboard.isDown( "escape" ) then
         love.event.push( "q" )
     end

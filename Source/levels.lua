@@ -69,7 +69,17 @@ Levels.map_display_h = 16
 Levels.tile_w = 40
 Levels.tile_h = 40
 
-function Levels:draw_map()
+function Levels.get_map_x_pos()
+	local x = (Levels.map_x * 40) - (Levels.map_offset_x + 40)
+	return x
+end
+
+function Levels.get_map_y_pos()
+	local y = (Levels.map_y * 40) - (Levels.map_offset_y + 40)
+	return y
+end
+
+function Levels.draw_map()
    for y=1, Levels.map_display_h do
       for x=1, Levels.map_display_w do                                                         
          love.graphics.draw( 
@@ -78,4 +88,34 @@ function Levels:draw_map()
             (y*Levels.tile_h)+Levels.map_offset_y )
       end
    end
+end
+
+function Levels.changeOffset(dir, v)
+	if dir == "up" then
+		Levels.map_offset_y = Levels.map_offset_y - v
+	elseif dir == "down" then
+		Levels.map_offset_y = Levels.map_offset_y + v
+	end
+	if dir == "left" then
+		Levels.map_offset_x = Levels.map_offset_x + v
+	elseif dir == "right" then
+		Levels.map_offset_x = Levels.map_offset_x - v
+	end
+end
+
+function Levels.update()
+	if Levels.map_offset_x > -40 and Levels.map_x > 0 then
+	   Levels.map_offset_x = Levels.map_offset_x - 40
+	   Levels.map_x = Levels.map_x - 1
+	elseif Levels.map_offset_x < -80 and Levels.map_x < Levels.map_w - Levels.map_display_w then
+	   Levels.map_offset_x = Levels.map_offset_x + 40
+	   Levels.map_x = Levels.map_x + 1
+	end
+	if Levels.map_offset_y > -40 and Levels.map_y > 0 then
+	   Levels.map_offset_y = Levels.map_offset_y - 40
+	   Levels.map_y = Levels.map_y - 1
+	elseif Levels.map_offset_y < -80 and Levels.map_y < Levels.map_h - Levels.map_display_h then
+	   Levels.map_offset_y = Levels.map_offset_y + 40
+	   Levels.map_y = Levels.map_y + 1
+	end
 end
