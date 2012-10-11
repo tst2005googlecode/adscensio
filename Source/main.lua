@@ -8,9 +8,8 @@ tile = {}
 for i=0,3 do -- change 3 to the number of tile images minus 1.
   tile[i] = love.graphics.newImage( "images/tile"..i..".png" )
 end
-game = {}
-game.state = "main"
 
+game_start = false
 Menu.load()
 
 hero = {}
@@ -26,8 +25,9 @@ function draw_character()
 end
 
 function draw_character_position()
-   love.graphics.print(hero.x + Levels.get_map_x_pos(), 40, 40)
+   love.graphics.print(hero.x + Levels.get_map_x_pos(), 40, 35)
    love.graphics.print(hero.y + Levels.get_map_y_pos(), 40, 55)
+   love.graphics.print(Menu.active_panel, 40, 75)
 end
 
 function get_character_x_pos()
@@ -41,24 +41,26 @@ function get_character_y_pos()
 end
 
 function love.draw()
-	if game.state == "main" then
+	if game_start == false then
 		Menu.draw_main()
-	elseif game.state == "game" then
+	elseif game_start == true then
 		Levels.draw_map()
 		draw_character()
-		draw_character_position()
+		
 		if Menu.active_panel ~=  "none" then
 			Menu.draw_game()
 		end
+		draw_character_position()
 	end
 end
 
-function love.update( dt )
-	if game.state == "main" then
+function love.update(dt)
+	if game_start == false then
 		if love.keyboard.isDown("return") then
-			game.state = "game"
+			game_start = true
 		end
-	elseif game.state == "game" and Menu.active_panel == "none" then
+		Menu.update_main(dt)
+	elseif game_start == true and Menu.active_panel == "none" then
 		-- get input for directional movement
 		if love.keyboard.isDown("down") and get_character_y_pos() < (Levels.map_h - 1) * 40 then
 			if hero.y < 400 then
@@ -89,14 +91,39 @@ function love.update( dt )
 			end
 		end
 		Levels.update()
+	elseif game_start == true and Menu.active_panel == "exit" then
+		if love.keyboard.isDown("return") and Menu.state == 0 then
+			love.event.push("quit")
+		elseif love.keyboard.isDown("return") and Menu.state == 1 then
+			Menu.toggle()
+		end
 	end
-	if love.keyboard.isDown("escape") then
-        love.event.push("quit")
-    end
 end 
 
 function love.keypressed(key)
-	if key == "a" then
+	if key == " " then
 		Menu.toggle()
+	end
+	if key == "escape" then
+		if game_start == true and Menu.active_panel ~= "none" then
+			Menu.toggle()
+		elseif game_start == true and Menu.active_panel == "none" then
+			Menu.active_panel = "exit"
+		else
+			love.event.push("quit")
+		end
+	end
+	if key == "left" then
+		if Menu.state == 0 and Menu.active_panel == "exit" then
+			Menu.state = 1
+		else
+			Menu.state = 0
+		end
+	elseif key == "right" then
+		if Menu.state == 0 and Menu.active_panel == "exit" then
+			Menu.state = 1
+		else
+			Menu.state = 0
+		end
 	end
 end
