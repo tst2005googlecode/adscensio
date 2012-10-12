@@ -42,13 +42,13 @@ end
 
 function love.draw()
 	if game_start == false then
-		Menu.draw_main()
+		Menu.draw()
 	elseif game_start == true then
 		Levels.draw_map()
 		draw_character()
 		
 		if Menu.active_panel ~=  "none" then
-			Menu.draw_game()
+			Menu.draw()
 		end
 		draw_character_position()
 	end
@@ -58,6 +58,7 @@ function love.update(dt)
 	if game_start == false then
 		if love.keyboard.isDown("return") then
 			game_start = true
+			Menu.active_panel = "none"
 		end
 		Menu.update_main(dt)
 	elseif game_start == true and Menu.active_panel == "none" then
@@ -91,12 +92,6 @@ function love.update(dt)
 			end
 		end
 		Levels.update()
-	elseif game_start == true and Menu.active_panel == "exit" then
-		if love.keyboard.isDown("return") and Menu.state == 0 then
-			love.event.push("quit")
-		elseif love.keyboard.isDown("return") and Menu.state == 1 then
-			Menu.toggle()
-		end
 	end
 end 
 
@@ -104,26 +99,11 @@ function love.keypressed(key)
 	if key == " " then
 		Menu.toggle()
 	end
-	if key == "escape" then
-		if game_start == true and Menu.active_panel ~= "none" then
-			Menu.toggle()
-		elseif game_start == true and Menu.active_panel == "none" then
+	if Menu.active_panel ~= "none" then
+		Menu.keys(key)
+	elseif key == "escape" then
+		if game_start == true and Menu.active_panel == "none" then
 			Menu.active_panel = "exit"
-		else
-			love.event.push("quit")
-		end
-	end
-	if key == "left" then
-		if Menu.state == 0 and Menu.active_panel == "exit" then
-			Menu.state = 1
-		else
-			Menu.state = 0
-		end
-	elseif key == "right" then
-		if Menu.state == 0 and Menu.active_panel == "exit" then
-			Menu.state = 1
-		else
-			Menu.state = 0
 		end
 	end
 end

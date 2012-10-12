@@ -1,7 +1,7 @@
 -- This file handles all game menus including the main menu and in game menu
 Menu = {}
 
-Menu.active_panel = "none"
+Menu.active_panel = "main"
 Menu.state = 0
 Menu.count = 0.75
 
@@ -9,27 +9,25 @@ function Menu.load()
 	Menu.title_font = love.graphics.newFont(36)
 	Menu.menu_font = love.graphics.newFont(20)
 end
--- Main Menu Code
-function Menu.draw_main()
-	love.graphics.setFont(Menu.title_font)
-	love.graphics.print("Title", 350, 100)
-	love.graphics.setFont(Menu.menu_font)
-	love.graphics.print("Start", 350, 275)
-	love.graphics.print("Options", 350, 300)
-	if Menu.count > 0.75 then
-		love.graphics.print("Press Enter!", 350, 400)
-	end
-end
 
 function Menu.update_main(dt)
 	Menu.count = Menu.count + dt
-	if Menu.count > 1.5 then
+	if Menu.count > 1.2 then
 		Menu.count = 0
 	end
 end
 -- Game Menu
-function Menu.draw_game()
+function Menu.draw()
 	if Menu.active_panel == "main" then
+		love.graphics.setFont(Menu.title_font)
+		love.graphics.print("Title", 350, 100)
+		love.graphics.setFont(Menu.menu_font)
+		--love.graphics.print("Start", 350, 275)
+		--love.graphics.print("Options", 350, 300)
+		if Menu.count > 0.6 then
+			love.graphics.print("Press Enter!", 330, 300)
+		end
+	elseif Menu.active_panel == "default" then
 		love.graphics.setFont(Menu.menu_font)
 		love.graphics.setColor(0, 0, 0, 140)
 		love.graphics.rectangle("fill", 0, 0, 800, 600)
@@ -71,9 +69,47 @@ end
 
 function Menu.toggle()
 	if Menu.active_panel == "none" then
-		Menu.active_panel = "main"
+		Menu.active_panel = "default"
 	else
 		Menu.active_panel = "none"
 		Menu.state = 0
+	end
+end
+
+function Menu.keys(key)
+	if key == "escape" then
+		if Menu.active_panel == "exit" then
+			Menu.active_panel = "none"
+		elseif Menu.active_panel == "main" then
+			love.event.push("quit")
+		else
+			Menu.toggle()
+		end
+	elseif key == "left" then
+		if Menu.active_panel == "exit" then
+			if Menu.state == 0 then
+				Menu.state = 1
+			else
+				Menu.state = 0
+			end
+		elseif Menu.active_panel == "default" then
+			Menu.active_panel = "controls"
+		end
+	elseif key == "right" then
+		if Menu.active_panel == "exit" then
+			if Menu.state == 0 then
+				Menu.state = 1
+			else
+				Menu.state = 0
+			end
+		elseif Menu.active_panel == "controls" then
+			Menu.active_panel = "default"
+		end
+	elseif key == "return" then
+		if Menu.active_panel == "exit" and Menu.state == 0 then
+			love.event.push("quit")
+		else 
+			Menu.toggle()
+		end
 	end
 end
