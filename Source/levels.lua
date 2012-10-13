@@ -92,9 +92,9 @@ end
 
 function Levels.changeOffset(dir, v)
 	if dir == "up" then
-		Levels.map_offset_y = Levels.map_offset_y - v
-	elseif dir == "down" then
 		Levels.map_offset_y = Levels.map_offset_y + v
+	elseif dir == "down" then
+		Levels.map_offset_y = Levels.map_offset_y - v
 	end
 	if dir == "left" then
 		Levels.map_offset_x = Levels.map_offset_x + v

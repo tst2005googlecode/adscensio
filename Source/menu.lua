@@ -54,14 +54,14 @@ function Menu.draw()
 		love.graphics.print("Are you sure?", 325, 230)
 		if Menu.state == 0 then
 			love.graphics.setColor(100, 255, 100)
-			love.graphics.print("Yes", 325, 270)
+			love.graphics.print("Yes", 350, 270)
 			love.graphics.setColor(255, 255, 255)
-			love.graphics.print("No", 400, 270)
+			love.graphics.print("No", 425, 270)
 		else
 			love.graphics.setColor(255, 255, 255)
-			love.graphics.print("Yes", 325, 270)
+			love.graphics.print("Yes", 350, 270)
 			love.graphics.setColor(100, 255, 100)
-			love.graphics.print("No", 400, 270)
+			love.graphics.print("No", 425, 270)
 			love.graphics.setColor(255, 255, 255)
 		end
 	end
