@@ -2,13 +2,15 @@
 require('levels')
 require('menu')
 require('entities')
+require('player')
 
 function love.load()
 -- tiles
-tile = {}
-for i=0,3 do -- change 3 to the number of tile images minus 1.
-  tile[i] = love.graphics.newImage( "images/tile"..i..".png" )
-end
+--tile = {}
+--for i=0,6 do -- change 3 to the number of tile images minus 1.
+--  tile[i] = love.graphics.newImage( "images/tile"..i..".png" )
+--end
+Levels.load_tiles()
 
 joysticks = love.joystick.getNumJoysticks()
 love.joystick.open(1)
@@ -19,36 +21,45 @@ game_start = false
 Menu.load()
 
 hero = {}
-hero.pic = love.graphics.newImage("images/actor_up.gif")
+hero.pic = love.graphics.newImage("images/actor.png")
+pic = love.graphics.newImage("images/circle.png")
+arrow = love.graphics.newImage("images/arrow.png")
 hero.x = 200
 hero.y = 200
 hero.dt = 250
 hero.dir = "down"
+hero.arrow = {}
+hero.arrow.x = -15
+hero.arrow.y = -15
+hero.arrow.dir = "up"
 
 end
 
 function draw_character()
-   love.graphics.draw(hero.pic, Entities.x, Entities.y)
+   love.graphics.draw(pic, Entities.x, Entities.y)
    love.graphics.draw(hero.pic, hero.x, hero.y)
+   if hero.arrow.x > 0 then
+		love.graphics.draw(arrow, hero.arrow.x, hero.arrow.y)
+   end
 end
 
 function draw_character_position()
 	love.graphics.print(hero.x + Levels.get_map_x_pos(), 40, 35)
 	love.graphics.print(hero.y + Levels.get_map_y_pos(), 40, 55)
 	love.graphics.print(Menu.active_panel, 40, 75)
-	love.graphics.print(joysticks, 40, 95)
-	love.graphics.print(button, 40, 115)
-	love.graphics.print(axes, 40, 135)
-	love.graphics.print("axis: "..love.joystick.getHat(1, 1), 40, 155)
+	love.graphics.print(love.timer.getFPS( ), 40, 95)
+	--love.graphics.print(button, 40, 115)
+	--love.graphics.print(axes, 40, 135)
+	--love.graphics.print("axis: "..love.joystick.getHat(1, 1), 40, 155)
 end
 
 function get_character_x_pos()
-	local x = hero.x + Levels.get_map_x_pos()
+	local x = hero.x + Levels.get_map_x_pos() + 20
 	return x
 end
 
 function get_character_y_pos()
-	local y = hero.y + Levels.get_map_y_pos()
+	local y = hero.y + Levels.get_map_y_pos() + 20
 	return y
 end
 
@@ -61,6 +72,27 @@ function resolve_collision(dir, x, y)
 		hero.y = y + 40
 	elseif y > hero.y and dir == "down" then
 		hero.y = y - 40
+	end
+	if hero.x > x and dir == "left" and hero.y + 30 < y then
+		hero.x = x + 40
+		hero.y = y - 40
+	elseif hero.x > x and dir == "left" and hero.y - 30 > y then
+		hero.x = x + 40
+		hero.y = y + 40
+	elseif x > hero.x and dir == "right" and hero.y + 30 < y then
+		hero.x = x - 40
+		hero.y = y - 40
+	elseif x > hero.x and dir == "right" and hero.y - 30 > y then
+		hero.x = x - 40
+		hero.y = y + 40
+	elseif hero.y > y and dir == "up" and hero.x + 30 < x then
+		hero.x = x - 40
+	elseif hero.y > y and dir == "up" and hero.x - 30 > x then
+		hero.x = x + 40
+	elseif y > hero.y and dir == "down" and hero.x + 30 < x then
+		hero.x = x - 40
+	elseif y > hero.y and dir == "down" and hero.x - 30 > x then
+		hero.x = x + 40
 	end
 end
 
@@ -87,65 +119,25 @@ function love.update(dt)
 		Menu.update_main(dt)
 	elseif game_start == true and Menu.active_panel == "none" then
 		-- get input for directional movement
-		if love.keyboard.isDown("down") or love.joystick.getHat(1, 1) == "d" or love.joystick.getHat(1, 1) == "ld" or love.joystick.getHat(1, 1) == "rd" then 
-			if get_character_y_pos() < (Levels.map_h - 1) * 40 then
-				hero.dir = "down"
-				if hero.y < 400 then
-				   hero.y = hero.y + hero.dt * dt
-				else
-				   Levels.changeOffset("down", dt * hero.dt)
-				   Entities.y = Entities.y - hero.dt * dt
-				end
-				if Entities.check_collision(hero.x, hero.y) then
-					resolve_collision(hero.dir, Entities.x, Entities.y)
-				end
-			end
-		end
-		if love.keyboard.isDown("up") or love.joystick.getHat(1, 1) == "u" or love.joystick.getHat(1, 1) == "lu" or love.joystick.getHat(1, 1) == "ru" then 
-			if get_character_y_pos() > 0 then
-				hero.dir = "up"
-				if hero.y > 150 then
-				   hero.y = hero.y - hero.dt * dt
-				else
-				   Levels.changeOffset("up", dt * hero.dt)
-				   Entities.y = Entities.y + hero.dt * dt
-				end
-				if Entities.check_collision(hero.x, hero.y) then
-					resolve_collision(hero.dir, Entities.x, Entities.y)
-				end
-			end
-		end
-		if love.keyboard.isDown("right") or love.joystick.getHat(1, 1) == "r" or love.joystick.getHat(1, 1) == "ru" or love.joystick.getHat(1, 1) == "rd" then
-			if get_character_x_pos() < (Levels.map_w - 1) * 40 then
-				hero.dir = "right"
-				if hero.x < 600 then
-				   hero.x = hero.x + hero.dt * dt
-				else
-				   Levels.changeOffset("right", dt * hero.dt)
-				   Entities.x = Entities.x - hero.dt * dt
-				end
-				if Entities.check_collision(hero.x, hero.y) then
-					--hero.x = hero.x - hero.dt * dt
-					resolve_collision(hero.dir, Entities.x, Entities.y)
-				end
-			end
-		end
-		if love.keyboard.isDown("left") or love.joystick.getHat(1, 1) == "l" or love.joystick.getHat(1, 1) == "lu" or love.joystick.getHat(1, 1) == "ld" then 
-			if get_character_x_pos() > 0 then
-				hero.dir = "left"
-				if hero.x > 150 then
-				   hero.x = hero.x - hero.dt * dt
-				else
-				   Levels.changeOffset("left", dt * hero.dt)
-				   Entities.x = Entities.x + hero.dt * dt
-				end
-				if Entities.check_collision(hero.x, hero.y) then
-					--hero.x = hero.x + hero.dt * dt
-					resolve_collision(hero.dir, Entities.x, Entities.y)
-				end
-			end
-		end
+		player_movement(dt)
 		Levels.update()
+		if hero.arrow.x > -20 and hero.arrow.y > -20 and hero.arrow.x < 780 and hero.arrow.y < 580 then
+			if hero.arrow.dir == "up" then
+				hero.arrow.y = hero.arrow.y - 350 * dt
+			elseif hero.arrow.dir == "down" then
+				hero.arrow.y = hero.arrow.y + 350 * dt
+			elseif hero.arrow.dir == "left" then
+				hero.arrow.x = hero.arrow.x - 350 * dt
+			elseif hero.arrow.dir == "right" then
+				hero.arrow.x = hero.arrow.x + 350 * dt
+			else
+				hero.arrow.x = 0
+				hero.arrow.y = 0
+			end
+		else
+			hero.arrow.x = -15
+			hero.arrow.y = -15
+		end
 	end
 end 
 
@@ -158,6 +150,12 @@ function love.keypressed(key)
 	elseif key == "escape" then
 		if game_start == true and Menu.active_panel == "none" then
 			Menu.active_panel = "exit"
+		end
+	elseif key == "1" then
+		if hero.arrow.x < 0 and hero.arrow.y < 0 then
+			hero.arrow.x = hero.x
+			hero.arrow.y = hero.y
+			hero.arrow.dir = hero.dir
 		end
 	end
 end

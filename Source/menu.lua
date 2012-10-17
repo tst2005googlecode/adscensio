@@ -22,8 +22,6 @@ function Menu.draw()
 		love.graphics.setFont(Menu.title_font)
 		love.graphics.print("Title", 350, 100)
 		love.graphics.setFont(Menu.menu_font)
-		--love.graphics.print("Start", 350, 275)
-		--love.graphics.print("Options", 350, 300)
 		if Menu.count > 0.6 then
 			love.graphics.print("Press Enter!", 330, 300)
 		end
