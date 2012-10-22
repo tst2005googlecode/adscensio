@@ -6,10 +6,6 @@ require('player')
 
 function love.load()
 -- tiles
---tile = {}
---for i=0,6 do -- change 3 to the number of tile images minus 1.
---  tile[i] = love.graphics.newImage( "images/tile"..i..".png" )
---end
 Levels.load_tiles()
 
 joysticks = love.joystick.getNumJoysticks()
@@ -18,6 +14,7 @@ button = love.joystick.getNumButtons(1)
 axes = love.joystick.getNumAxes(1)
 
 game_start = false
+show_debug = false
 Menu.load()
 
 hero = {}
@@ -33,21 +30,30 @@ hero.arrow.x = -15
 hero.arrow.y = -15
 hero.arrow.dir = "up"
 
+a = {}
+a.one = Entities:new(250, 150)
+a.two = Entities:new(100, 100)
+a.three = Entities:new(500, 200)
+
 end
 
 function draw_character()
-   love.graphics.draw(pic, Entities.x, Entities.y)
+   --love.graphics.draw(pic, a.x, a.y)
+   for i,item in pairs(a) do
+		item:draw()
+   end
+   --a:draw()
    love.graphics.draw(hero.pic, hero.x, hero.y)
    if hero.arrow.x > 0 then
 		love.graphics.draw(arrow, hero.arrow.x, hero.arrow.y)
    end
 end
 
-function draw_character_position()
-	love.graphics.print(hero.x + Levels.get_map_x_pos(), 40, 35)
-	love.graphics.print(hero.y + Levels.get_map_y_pos(), 40, 55)
+function draw_debug()
+	love.graphics.print("X: " .. hero.x + Levels.get_map_x_pos(), 40, 35)
+	love.graphics.print("Y: " .. hero.y + Levels.get_map_y_pos(), 40, 55)
 	love.graphics.print(Menu.active_panel, 40, 75)
-	love.graphics.print(love.timer.getFPS( ), 40, 95)
+	love.graphics.print("FPS: " .. love.timer.getFPS( ), 40, 95)
 	--love.graphics.print(button, 40, 115)
 	--love.graphics.print(axes, 40, 135)
 	--love.graphics.print("axis: "..love.joystick.getHat(1, 1), 40, 155)
@@ -106,7 +112,9 @@ function love.draw()
 		if Menu.active_panel ~=  "none" then
 			Menu.draw()
 		end
-		draw_character_position()
+		if show_debug then
+			draw_debug()
+		end
 	end
 end
 
@@ -156,6 +164,12 @@ function love.keypressed(key)
 			hero.arrow.x = hero.x
 			hero.arrow.y = hero.y
 			hero.arrow.dir = hero.dir
+		end
+	elseif key == "f3" then
+		if show_debug == false then
+			show_debug = true
+		else
+			show_debug = false
 		end
 	end
 end
