@@ -15,7 +15,7 @@ end
 
 function Entities:draw()
 	love.graphics.setColor(255, 255, 255, 255)
-	love.graphics.draw(self.pic, self.x, self.y)
+	love.graphics.draw(self.pic, self.x, self.y, 0, 1, 1, 20, 20)
 end
 
 function Entities:update(dir, del)
@@ -30,10 +30,19 @@ function Entities:update(dir, del)
 	end
 end
 
-function Entities:check_collision(x, y)
+function Entities:check_collision(t, x, y)
 	result = false
-	if x < self.x + 40 and x + 40 > self.x and y < self.y + 40 and y + 40 > self.y then
-		result = true
+	if t == "box" then
+		if x < self.x + 40 and x + 40 > self.x and y < self.y + 40 and y + 40 > self.y then
+			result = true
+		end
+	elseif t == "circle" then
+		local xCom = x - self.x
+		local yCom = y - self.y
+		local dist = math.sqrt((xCom ^ 2) + (yCom ^ 2))
+		if dist < 40 then
+			result = true
+		end
 	end
 	return result
 end

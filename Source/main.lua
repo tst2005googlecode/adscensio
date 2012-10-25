@@ -25,15 +25,17 @@ hero.x = 200
 hero.y = 200
 hero.dt = 250
 hero.dir = "down"
+hero.collide = "none"
 hero.arrow = {}
 hero.arrow.x = -15
 hero.arrow.y = -15
 hero.arrow.dir = "up"
+col = false
 
 a = {}
-a.one = Entities:new(250, 150)
-a.two = Entities:new(100, 100)
-a.three = Entities:new(500, 200)
+a.one = Entities:new(270, 150)
+a.two = Entities:new(120, 100)
+a.three = Entities:new(220, 570)
 
 end
 
@@ -43,7 +45,7 @@ function draw_character()
 		item:draw()
    end
    --a:draw()
-   love.graphics.draw(hero.pic, hero.x, hero.y)
+   love.graphics.draw(hero.pic, hero.x, hero.y, 0, 1, 1, 20, 20)
    if hero.arrow.x > 0 then
 		love.graphics.draw(arrow, hero.arrow.x, hero.arrow.y)
    end
@@ -54,31 +56,42 @@ function draw_debug()
 	love.graphics.print("Y: " .. hero.y + Levels.get_map_y_pos(), 40, 55)
 	love.graphics.print(Menu.active_panel, 40, 75)
 	love.graphics.print("FPS: " .. love.timer.getFPS( ), 40, 95)
-	--love.graphics.print(button, 40, 115)
+	if col then
+		love.graphics.print("Collide ", 40, 115)
+	end
 	--love.graphics.print(axes, 40, 135)
 	--love.graphics.print("axis: "..love.joystick.getHat(1, 1), 40, 155)
 end
 
 function get_character_x_pos()
-	local x = hero.x + Levels.get_map_x_pos() + 20
+	local x = hero.x + Levels.get_map_x_pos()
 	return x
 end
 
 function get_character_y_pos()
-	local y = hero.y + Levels.get_map_y_pos() + 20
+	local y = hero.y + Levels.get_map_y_pos()
 	return y
 end
 
-function resolve_collision(dir, x, y)
+function resolve_collision(dt, dir, x, y)
+	local xc = hero.x - x
+	local yc = hero.y - y
 	if hero.x > x and dir == "left" then
-		hero.x = x + 40
+		hero.x = hero.x + dt
+		hero.collide = dir
 	elseif x > hero.x and dir == "right" then
-		hero.x = x - 40
+		hero.x = hero.x - dt
+		hero.collide = dir
 	elseif hero.y > y and dir == "up" then
-		hero.y = y + 40
+		hero.y = hero.y + dt
+		hero.collide = dir
 	elseif y > hero.y and dir == "down" then
-		hero.y = y - 40
+		hero.y = hero.y - dt
+		hero.collide = dir
+	else
+		hero.collide = "none"
 	end
+	--[[ this needs to be cleaned up
 	if hero.x > x and dir == "left" and hero.y + 30 < y then
 		hero.x = x + 40
 		hero.y = y - 40
@@ -99,7 +112,7 @@ function resolve_collision(dir, x, y)
 		hero.x = x - 40
 	elseif y > hero.y and dir == "down" and hero.x - 30 > x then
 		hero.x = x + 40
-	end
+	end]]
 end
 
 function love.draw()

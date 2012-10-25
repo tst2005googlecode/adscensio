@@ -1,3 +1,10 @@
+--[[ levels.lua
+This file handles the maps of the game at the moment only one map is available
+The map data needs to be moved to a seperate file and code to dynamically load it is needed
+With that, code can be added to handle transitions between maps. Eventually zones could be created to
+handle large worlds. A map editor could also be created later
+]]
+
 Levels = {}
 Levels.map = {
 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -60,7 +67,7 @@ Levels.map = {
 -- map variables
 Levels.map_w = #Levels.map[1]
 Levels.map_h = #Levels.map
-Levels.map_x = 4
+Levels.map_x = 8
 Levels.map_y = 4
 Levels.map_offset_x = -40
 Levels.map_offset_y = -40
