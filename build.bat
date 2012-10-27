@@ -1,4 +1,5 @@
 -- This batch script makes it easier to build the game
+-- just double click to make the .love file
 PATH=%~dp0
 cd %PATH%Source
 -- If you do not have 7-Zip then change the command for your preference

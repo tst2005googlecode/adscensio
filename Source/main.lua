@@ -17,20 +17,10 @@ game_start = false
 show_debug = false
 Menu.load()
 
-hero = {}
-hero.pic = love.graphics.newImage("images/actor.png")
+-- TODO: hero needs to be removed and replaced with a player object
+player.load()
 pic = love.graphics.newImage("images/circle.png")
 arrow = love.graphics.newImage("images/arrow.png")
-hero.x = 200
-hero.y = 200
-hero.dt = 250
-hero.dir = "down"
-hero.collide = "none"
-hero.arrow = {}
-hero.arrow.x = -15
-hero.arrow.y = -15
-hero.arrow.dir = "up"
-col = false
 
 a = {}
 a.one = Entities:new(270, 150)
@@ -40,58 +30,53 @@ a.three = Entities:new(220, 570)
 end
 
 function draw_character()
-   --love.graphics.draw(pic, a.x, a.y)
    for i,item in pairs(a) do
 		item:draw()
    end
-   --a:draw()
-   love.graphics.draw(hero.pic, hero.x, hero.y, 0, 1, 1, 20, 20)
-   if hero.arrow.x > 0 then
-		love.graphics.draw(arrow, hero.arrow.x, hero.arrow.y)
+   love.graphics.draw(player.pic, player.x, player.y, 0, 1, 1, 20, 20)
+   if player.arrow.x > 0 then
+		love.graphics.draw(arrow, player.arrow.x, player.arrow.y)
    end
 end
 
 function draw_debug()
-	love.graphics.print("X: " .. hero.x + Levels.get_map_x_pos(), 40, 35)
-	love.graphics.print("Y: " .. hero.y + Levels.get_map_y_pos(), 40, 55)
+	love.graphics.print("X: " .. player.x + Levels.get_map_x_pos(), 40, 35)
+	love.graphics.print("Y: " .. player.y + Levels.get_map_y_pos(), 40, 55)
 	love.graphics.print(Menu.active_panel, 40, 75)
 	love.graphics.print("FPS: " .. love.timer.getFPS( ), 40, 95)
-	if col then
-		love.graphics.print("Collide ", 40, 115)
-	end
-	--love.graphics.print(axes, 40, 135)
-	--love.graphics.print("axis: "..love.joystick.getHat(1, 1), 40, 155)
+	love.graphics.print(a.one.x, 40, 115)
+	love.graphics.print(a.one.y, 40, 135)
 end
 
 function get_character_x_pos()
-	local x = hero.x + Levels.get_map_x_pos()
+	local x = player.x + Levels.get_map_x_pos()
 	return x
 end
 
 function get_character_y_pos()
-	local y = hero.y + Levels.get_map_y_pos()
+	local y = player.y + Levels.get_map_y_pos()
 	return y
 end
 
 function resolve_collision(dt, dir, x, y)
-	local xc = hero.x - x
-	local yc = hero.y - y
-	if hero.x > x and dir == "left" then
-		hero.x = hero.x + dt
-		hero.collide = dir
-	elseif x > hero.x and dir == "right" then
-		hero.x = hero.x - dt
-		hero.collide = dir
-	elseif hero.y > y and dir == "up" then
-		hero.y = hero.y + dt
-		hero.collide = dir
-	elseif y > hero.y and dir == "down" then
-		hero.y = hero.y - dt
-		hero.collide = dir
+	local xc = player.x - x
+	local yc = player.y - y
+	if player.x > x and dir == "left" then
+		player.x = player.x + dt
+		player.collide = dir
+	elseif x > player.x and dir == "right" then
+		player.x = player.x - dt
+		player.collide = dir
+	elseif player.y > y and dir == "up" then
+		player.y = player.y + dt
+		player.collide = dir
+	elseif y > player.y and dir == "down" then
+		player.y = player.y - dt
+		player.collide = dir
 	else
-		hero.collide = "none"
+		player.collide = "none"
 	end
-	--[[ this needs to be cleaned up
+	--[[ TODO: this needs to be cleaned up
 	if hero.x > x and dir == "left" and hero.y + 30 < y then
 		hero.x = x + 40
 		hero.y = y - 40
@@ -142,22 +127,23 @@ function love.update(dt)
 		-- get input for directional movement
 		player_movement(dt)
 		Levels.update()
-		if hero.arrow.x > -20 and hero.arrow.y > -20 and hero.arrow.x < 780 and hero.arrow.y < 580 then
-			if hero.arrow.dir == "up" then
-				hero.arrow.y = hero.arrow.y - 350 * dt
-			elseif hero.arrow.dir == "down" then
-				hero.arrow.y = hero.arrow.y + 350 * dt
-			elseif hero.arrow.dir == "left" then
-				hero.arrow.x = hero.arrow.x - 350 * dt
-			elseif hero.arrow.dir == "right" then
-				hero.arrow.x = hero.arrow.x + 350 * dt
+		-- TODO: this next section needs to be moved to player.lua
+		if player.arrow.x > -20 and player.arrow.y > -20 and player.arrow.x < 780 and player.arrow.y < 580 then
+			if player.arrow.dir == "up" then
+				player.arrow.y = player.arrow.y - 350 * dt
+			elseif player.arrow.dir == "down" then
+				player.arrow.y = player.arrow.y + 350 * dt
+			elseif player.arrow.dir == "left" then
+				player.arrow.x = player.arrow.x - 350 * dt
+			elseif player.arrow.dir == "right" then
+				player.arrow.x = player.arrow.x + 350 * dt
 			else
-				hero.arrow.x = 0
-				hero.arrow.y = 0
+				player.arrow.x = 0
+				player.arrow.y = 0
 			end
 		else
-			hero.arrow.x = -15
-			hero.arrow.y = -15
+			player.arrow.x = -15
+			player.arrow.y = -15
 		end
 	end
 end 
@@ -173,10 +159,10 @@ function love.keypressed(key)
 			Menu.active_panel = "exit"
 		end
 	elseif key == "1" then
-		if hero.arrow.x < 0 and hero.arrow.y < 0 then
-			hero.arrow.x = hero.x
-			hero.arrow.y = hero.y
-			hero.arrow.dir = hero.dir
+		if player.arrow.x < 0 and player.arrow.y < 0 then
+			player.arrow.x = player.x
+			player.arrow.y = player.y
+			player.arrow.dir = player.dir
 		end
 	elseif key == "f3" then
 		if show_debug == false then
